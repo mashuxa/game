@@ -18,7 +18,7 @@ export class SelectedLettersComponent extends HTMLElement {
   render(): void {
     const wrapper = document.createElement("div");
 
-    wrapper.setAttribute("part", "controller-selected-letters");
+    wrapper.setAttribute("part", "controller-selected-wrapper");
     this.letters.forEach((letter) => {
       const cell = document.createElement("div");
       const cellWidth = `min(100vw, 100vh, 640px)/${this.letters.length} - 6px`;

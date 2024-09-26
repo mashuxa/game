@@ -26,7 +26,7 @@ export class WordComponent extends HTMLElement {
   render(): void {
     const wrapper = document.createElement("div");
 
-    wrapper.setAttribute("part", "cell-wrapper");
+    wrapper.setAttribute("part", "word-cell-wrapper");
     wrapper.classList.add("letter-list");
 
     this.letters.forEach((letter) => {
@@ -34,7 +34,7 @@ export class WordComponent extends HTMLElement {
       const cellWidth = `min(100vw, 100vh, ${maxWidth})/${this.maxSize} - 6px`;
 
       element.classList.add("cell");
-      element.setAttribute("part", "cell");
+      element.setAttribute("part", "word-cell");
       element.style.backgroundColor = letter.trim() ? success : light;
       element.style.width = `calc(${cellWidth})`;
       element.style.fontSize = `min(calc((${cellWidth})*0.568), 42px)`;

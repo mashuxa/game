@@ -1,11 +1,9 @@
-const template = `
-        <div part="controller-wrapper">
-            <selected-letters-component letters=""></selected-letters-component>
-            <div part="controller-letters"></div>   
-        </div>`;
+import { shuffleArray } from "../../utils/utils";
+import template, { CONTROLLER_WIDTH } from "./template";
 
 export class ControllerComponent extends HTMLElement {
   private selectedLettersNode: Element | null;
+  private readonly controllerNode: Element | null;
   private selectedLetters: string[];
 
   constructor() {
@@ -13,6 +11,7 @@ export class ControllerComponent extends HTMLElement {
     this.selectedLetters = [];
     this.innerHTML = template;
     this.selectedLettersNode = this.querySelector("selected-letters-component");
+    this.controllerNode = this.querySelector(".controller-letters");
   }
 
   static get observedAttributes(): string[] {
@@ -21,6 +20,36 @@ export class ControllerComponent extends HTMLElement {
 
   get letters(): string[] {
     return (this.getAttribute("letters") || "").split("");
+  }
+
+  connectedCallback(): void {
+    this.selectedLettersNode?.setAttribute("letters", this.selectedLetters.join(""));
+  }
+
+  attributeChangedCallback(): void {
+    this.render();
+  }
+
+  render(): void {
+    if (!this.controllerNode) return;
+
+    this.controllerNode.innerHTML = "";
+    shuffleArray(this.letters).forEach((letter, index, arr) => {
+      const letterNode = document.createElement("div");
+      const radius = CONTROLLER_WIDTH / 2;
+      const angle = (index / arr.length) * 2 * Math.PI - Math.PI / 2;
+      const x = Math.cos(angle) * radius;
+      const y = Math.sin(angle) * radius;
+
+      letterNode.setAttribute("part", "controller-letter");
+      letterNode.innerHTML = letter;
+
+      this.controllerNode?.appendChild(letterNode);
+
+      setTimeout(() => {
+        letterNode.style.transform = `translate(${x}px, ${y}px)`;
+      }, 100);
+    });
   }
 }
 

@@ -22,7 +22,7 @@ export class TitleComponent extends HTMLElement {
   }
 
   render(): void {
-    this.innerHTML = `<h1 part="title">Уровень ${this.level}</h1>`;
+    this.innerHTML = `<h1 part="main-title">Уровень ${this.level}</h1>`;
   }
 }
 

@@ -30,3 +30,20 @@ export const collectLetters = (words: string[]): string[] => {
     return [...acc, ...new Array(count).fill(letter)];
   }, []);
 };
+
+const getRandomValue = (start: number, end: number): number => {
+  return Math.floor(Math.random() * (end + 1 - start) + start);
+};
+
+export const shuffleArray = <T>(array: T[]): T[] => {
+  return array.reduce(
+    (acc, _, currentIndex) => {
+      const randomIndex = getRandomValue(0, array.length - 1);
+
+      [acc[currentIndex], acc[randomIndex]] = [acc[randomIndex], acc[currentIndex]];
+
+      return acc;
+    },
+    [...array],
+  );
+};
