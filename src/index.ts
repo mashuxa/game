@@ -1,9 +1,11 @@
 import "./components/ButtonComponent/ButtonComponent";
+import "./components/ControllerComponent/ControllerComponent";
+import "./components/SelectedLettersComponent/SelectedLettersComponent";
 import "./components/TitleComponent/TitleComponent";
 import "./components/WordComponent/WordComponent";
 import "./styles/main.scss";
 import { Event } from "./types/events";
-import { joinLettersMaps, sortStringByAscending } from "./utils/utils";
+import { collectLetters, sortStringByAscending } from "./utils/utils";
 
 const LEVEL_SETS_COUNT = 3;
 
@@ -11,35 +13,33 @@ interface WordsSet {
   words: string[];
 }
 
+const template = `
+        <title-component level="1"></title-component>
+        <div class="word-list"></div>
+        <controller-component letters=""></controller-component>
+        <button-component></button-component>
+    `;
+
 export class App extends HTMLElement {
   private titleNode: Element | null;
   private readonly wordList: Element | null;
+  private controller: Element | null;
   public level: number;
   private wordSet: string[];
   private readonly visibleWords: Set<string>;
-  private letterSet: Map<string, number>;
 
   constructor() {
     super();
     this.level = 1;
     this.wordSet = [];
-    //todo: to delete example word
-    this.visibleWords = new Set(["брат", "тара"]);
-    this.letterSet = new Map();
+    this.visibleWords = new Set();
 
-    this.attachShadow({ mode: "open" }).innerHTML = this.template;
+    this.attachShadow({ mode: "open" }).innerHTML = template;
     void this.updateWordSet();
 
     this.titleNode = this.shadowRoot && this.shadowRoot.querySelector("title-component");
     this.wordList = this.shadowRoot && this.shadowRoot.querySelector(".word-list");
-  }
-
-  get template(): string {
-    return `
-        <title-component level="${this.level}"></title-component>
-        <div class="word-list"></div>
-        <button-component></button-component>
-    `;
+    this.controller = this.shadowRoot && this.shadowRoot.querySelector("controller-component");
   }
 
   incrementLevel(): void {
@@ -55,7 +55,7 @@ export class App extends HTMLElement {
     const { words } = (await response.json()) as WordsSet;
 
     this.wordSet = words.sort(sortStringByAscending);
-    this.letterSet = words.reduce(joinLettersMaps, new Map());
+    this.controller?.setAttribute("letters", collectLetters(words).join(""));
     this.renderWords();
   }
 
@@ -75,7 +75,7 @@ export class App extends HTMLElement {
     this.wordList.innerHTML = "";
     this.wordSet.forEach((word) => {
       const element = document.createElement("word-component");
-      const data = this.visibleWords.has(word) ? word.toUpperCase() : word.replace(/./g, " ");
+      const data = this.visibleWords.has(word) ? word : word.replace(/./g, " ");
 
       element.setAttribute("data", data);
       element.setAttribute("max-size", maxWordSize.toString());

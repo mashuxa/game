@@ -1,3 +1,16 @@
+.cell {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-shrink: 0;
+  text-transform: uppercase;
+  user-select: none;
+  margin: 3px;
+  border-radius: 25%;
+  aspect-ratio: 1;
+  line-height: 100%;
+}
+
 html {
   color: white;
   background-color: #2b344b;
@@ -13,16 +26,9 @@ html {
 
 app-component {
   &::part(cell) {
-    user-select: none;
-    display: flex;
-    flex-shrink: 0;
-    justify-content: center;
-    align-items: center;
+    @extend .cell;
+
     max-width: 72px;
-    margin: 3px;
-    aspect-ratio: 1;
-    border-radius: 25%;
-    line-height: 100%;
   }
 
   &::part(cell-wrapper) {
@@ -34,5 +40,19 @@ app-component {
   &::part(title) {
     text-align: center;
     font-size: 30px;
+  }
+
+  &::part(controller-selected-letters) {
+    display: flex;
+    justify-content: center;
+    padding: 1.5rem 0;
+  }
+
+  &::part(controller-selected-letter) {
+    @extend .cell;
+
+    max-width: 42px;
+    color: #4D4D4D;
+    background-color: white;
   }
 }

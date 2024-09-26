@@ -22,3 +22,11 @@ export const joinLettersMaps = (acc: Map<string, number>, word: string): Map<str
 
   return acc;
 };
+
+export const collectLetters = (words: string[]): string[] => {
+  const lettersMap = words.reduce<Map<string, number>>(joinLettersMaps, new Map());
+
+  return [...lettersMap.entries()].reduce<string[]>((acc, [letter, count]) => {
+    return [...acc, ...new Array(count).fill(letter)];
+  }, []);
+};
