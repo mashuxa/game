@@ -6,7 +6,6 @@
   text-transform: uppercase;
   aspect-ratio: 1;
   line-height: 100%;
-  user-select: none;
 }
 
 .cell {
@@ -25,6 +24,7 @@ html {
 .app-wrapper {
   max-width: 640px;
   margin: auto;
+  user-select: none;
 }
 
 app-component {
@@ -85,10 +85,11 @@ app-component {
     color: #4D4D4D;
     background-color: #FFF;
     box-shadow: 0 5px 0 0 #9FA1A5;
+  }
 
-    //.selected
-    //color: #FFF;
-    //background-color: #E870A5;
-    //box-shadow: 0 5px 0 0 #B0638D;
+  &::part(controller-letter selected) {
+    color: #FFF;
+    background-color: #E870A5;
+    box-shadow: 0 5px 0 0 #B0638D;
   }
 }

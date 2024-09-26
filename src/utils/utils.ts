@@ -31,7 +31,7 @@ export const collectLetters = (words: string[]): string[] => {
   }, []);
 };
 
-const getRandomValue = (start: number, end: number): number => {
+export const getRandomValue = (start: number, end: number): number => {
   return Math.floor(Math.random() * (end + 1 - start) + start);
 };
 
@@ -46,4 +46,12 @@ export const shuffleArray = <T>(array: T[]): T[] => {
     },
     [...array],
   );
+};
+
+export const calculateCircleCoordinates = (radius: number, fractionPosition: number): { x: number; y: number } => {
+  const angle = fractionPosition * 2 * Math.PI - Math.PI / 2;
+  const x = Math.cos(angle) * radius;
+  const y = Math.sin(angle) * radius;
+
+  return { x, y };
 };

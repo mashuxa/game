@@ -1,16 +1,25 @@
-import { shuffleArray } from "../../utils/utils";
+import { calculateCircleCoordinates, shuffleArray } from "../../utils/utils";
 import template, { CONTROLLER_WIDTH } from "./template";
 
+interface ListenerData {
+  type: string;
+  listener: EventListener;
+}
+
 export class ControllerComponent extends HTMLElement {
-  private selectedLettersNode: Element | null;
   private readonly controllerNode: Element | null;
-  private selectedLetters: string[];
+  private letters: string[];
+  private selected: HTMLElement[];
+  private pointerdown: boolean;
+  private letterListeners: Map<HTMLElement, ListenerData[]>;
 
   constructor() {
     super();
-    this.selectedLetters = [];
+    this.letters = [];
+    this.selected = [];
+    this.letterListeners = new Map();
     this.innerHTML = template;
-    this.selectedLettersNode = this.querySelector("selected-letters-component");
+    this.pointerdown = false;
     this.controllerNode = this.querySelector(".controller-letters");
   }
 
@@ -18,15 +27,61 @@ export class ControllerComponent extends HTMLElement {
     return ["letters"];
   }
 
-  get letters(): string[] {
-    return (this.getAttribute("letters") || "").split("");
+  setPointerDown = (): void => {
+    this.pointerdown = true;
+  };
+  setPointerUp = (): void => {
+    this.pointerdown = false;
+    //check existing words
+    this.selected.forEach((node) => node.part.remove("selected"));
+    this.selected = [];
+  };
+  onPointerIn = ({ target }: Event): void => {
+    const node = target as HTMLElement;
+
+    if (this.pointerdown) {
+      if (this.selected[this.selected.length - 2] === node) {
+        this.selected.pop()?.part.remove("selected");
+      } else if (!this.selected.includes(node)) {
+        this.selected.push(node);
+        node.part.add("selected");
+      }
+    }
+  };
+  onPointerDown = ({ target }: Event): void => {
+    const node = target as HTMLElement;
+
+    this.selected.push(node);
+    node.part.add("selected");
+  };
+
+  addListeners(): void {
+    document.addEventListener("pointerdown", this.setPointerDown);
+    document.addEventListener("pointerup", this.setPointerUp);
+  }
+  removeListeners(): void {
+    document.removeEventListener("pointerdown", this.setPointerDown);
+    document.removeEventListener("pointerup", this.setPointerUp);
+
+    this.letterListeners.forEach((listeners, element) => {
+      listeners.forEach(({ type, listener }) => {
+        element.removeEventListener(type, listener);
+      });
+    });
+    this.letterListeners.clear();
   }
 
   connectedCallback(): void {
-    this.selectedLettersNode?.setAttribute("letters", this.selectedLetters.join(""));
+    this.addListeners();
   }
+  disconnectedCallback(): void {
+    this.removeListeners();
+  }
+  attributeChangedCallback(name: string, oldValue: string, newValue: string): void {
+    if (name === "letters" && oldValue !== newValue) {
+      this.letters = shuffleArray(newValue.split(""));
+    }
 
-  attributeChangedCallback(): void {
     this.render();
   }
 
@@ -34,16 +89,19 @@ export class ControllerComponent extends HTMLElement {
     if (!this.controllerNode) return;
 
     this.controllerNode.innerHTML = "";
-    shuffleArray(this.letters).forEach((letter, index, arr) => {
+    this.letters.forEach((letter, index, arr) => {
       const letterNode = document.createElement("div");
-      const radius = CONTROLLER_WIDTH / 2;
-      const angle = (index / arr.length) * 2 * Math.PI - Math.PI / 2;
-      const x = Math.cos(angle) * radius;
-      const y = Math.sin(angle) * radius;
+      const { x, y } = calculateCircleCoordinates(CONTROLLER_WIDTH / 2, index / arr.length);
+      const listenersData = [
+        { type: "pointerdown", listener: this.onPointerDown },
+        { type: "pointerenter", listener: this.onPointerIn },
+      ];
 
-      letterNode.setAttribute("part", "controller-letter");
+      this.letterListeners.set(letterNode, listenersData);
+      listenersData.forEach(({ type, listener }) => letterNode.addEventListener(type, listener));
+
       letterNode.innerHTML = letter;
-
+      letterNode.setAttribute("part", "controller-letter");
       this.controllerNode?.appendChild(letterNode);
 
       setTimeout(() => {

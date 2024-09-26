@@ -1,4 +1,12 @@
-import { collectLetters, joinLettersMaps, mapLettersInWord, sortStringByAscending } from "./utils";
+import {
+  calculateCircleCoordinates,
+  collectLetters,
+  getRandomValue,
+  joinLettersMaps,
+  mapLettersInWord,
+  shuffleArray,
+  sortStringByAscending,
+} from "./utils";
 
 describe("Utility Functions", () => {
   test("sortStringByAscending should sort by string length", () => {
@@ -37,5 +45,29 @@ describe("Utility Functions", () => {
     expect(result).toContain("б");
     expect(result).toContain("а");
     expect(result).toContain("р");
+  });
+
+  test("getRandomValue should return value between provided numbers", () => {
+    const result = getRandomValue(-2, 2);
+
+    expect(result).toBeLessThanOrEqual(2);
+    expect(result).toBeGreaterThanOrEqual(-2);
+  });
+
+  test("shuffleArray should return shuffled array", () => {
+    const srcArray = [1, 2, 3, 4, 5, 6, 7];
+    const result = shuffleArray(srcArray);
+
+    expect(result).toHaveLength(7);
+    expect(result).toEqual(expect.arrayContaining(srcArray));
+  });
+
+  test("calculateCircleCoordinates should return right coordinates for segment", () => {
+    const radius = 10;
+    const firstTopElement = 1 / 4;
+    const result = calculateCircleCoordinates(radius, firstTopElement);
+
+    expect(result.x).toBeCloseTo(10);
+    expect(result.y).toBeCloseTo(0);
   });
 });
