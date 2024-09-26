@@ -1,5 +1,6 @@
-import "./components/ButtonComponent";
-import "./components/TitleComponent";
+import "./components/ButtonComponent/ButtonComponent";
+import "./components/TitleComponent/TitleComponent";
+import "./components/WordComponent/WordComponent";
 import "./styles/main.scss";
 import { Event } from "./types/events";
 import { joinLettersMaps, sortStringByAscending } from "./utils/utils";
@@ -12,24 +13,31 @@ interface WordsSet {
 
 export class App extends HTMLElement {
   private titleNode: Element | null;
+  private readonly wordList: Element | null;
   public level: number;
-  private wordSet: Set<string>;
+  private wordSet: string[];
+  private readonly visibleWords: Set<string>;
   private letterSet: Map<string, number>;
 
   constructor() {
     super();
     this.level = 1;
-    this.wordSet = new Set();
+    this.wordSet = [];
+    //todo: to delete example word
+    this.visibleWords = new Set(["брат", "тара"]);
     this.letterSet = new Map();
 
     this.attachShadow({ mode: "open" }).innerHTML = this.template;
-    this.titleNode = this.shadowRoot ? this.shadowRoot.querySelector("title-component") : null;
     void this.updateWordSet();
+
+    this.titleNode = this.shadowRoot && this.shadowRoot.querySelector("title-component");
+    this.wordList = this.shadowRoot && this.shadowRoot.querySelector(".word-list");
   }
 
   get template(): string {
     return `
         <title-component level="${this.level}"></title-component>
+        <div class="word-list"></div>
         <button-component></button-component>
     `;
   }
@@ -46,10 +54,9 @@ export class App extends HTMLElement {
     const response = await fetch(`../levels/${fileName}.json`);
     const { words } = (await response.json()) as WordsSet;
 
-    this.wordSet = new Set(words.sort(sortStringByAscending));
+    this.wordSet = words.sort(sortStringByAscending);
     this.letterSet = words.reduce(joinLettersMaps, new Map());
-
-    console.warn(this.wordSet, this.letterSet);
+    this.renderWords();
   }
 
   connectedCallback(): void {
@@ -58,6 +65,22 @@ export class App extends HTMLElement {
 
   disconnectedCallback(): void {
     this.removeEventListener(Event.incrementLevel, this.incrementLevel);
+  }
+
+  renderWords(): void {
+    if (!this.shadowRoot || !this.wordList) return;
+
+    const maxWordSize = this.wordSet[this.wordSet.length - 1].length;
+
+    this.wordList.innerHTML = "";
+    this.wordSet.forEach((word) => {
+      const element = document.createElement("word-component");
+      const data = this.visibleWords.has(word) ? word.toUpperCase() : word.replace(/./g, " ");
+
+      element.setAttribute("data", data);
+      element.setAttribute("max-size", maxWordSize.toString());
+      this.wordList?.appendChild(element);
+    });
   }
 }
 

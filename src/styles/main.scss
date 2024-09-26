@@ -1,3 +1,38 @@
-body {
+html {
+  color: white;
   background-color: #2b344b;
+  padding: 1vw;
+  font-family: "VAG World Bold", sans-serif;
+  font-size: 14px;
+}
+
+.app-wrapper {
+  max-width: 640px;
+  margin: auto;
+}
+
+app-component {
+  &::part(cell) {
+    user-select: none;
+    display: flex;
+    flex-shrink: 0;
+    justify-content: center;
+    align-items: center;
+    max-width: 72px;
+    margin: 3px;
+    aspect-ratio: 1;
+    border-radius: 25%;
+    line-height: 100%;
+  }
+
+  &::part(cell-wrapper) {
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: center;
+  }
+
+  &::part(title) {
+    text-align: center;
+    font-size: 30px;
+  }
 }
