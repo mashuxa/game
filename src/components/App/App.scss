@@ -1,0 +1,14 @@
+@use '../../styles/common';
+
+app-component {
+  &::part(app-wrapper) {
+    margin: auto;
+    user-select: none
+  }
+
+  &::part(word-list) {
+    opacity: 0;
+    min-height: 240px;
+    animation: fadeIn 1s ease forwards;
+  }
+}

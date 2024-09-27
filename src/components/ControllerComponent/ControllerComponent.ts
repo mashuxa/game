@@ -1,6 +1,6 @@
 import { Event } from "../../types/events";
 import { calculateCircleCoordinates, shuffleArray } from "../../utils/utils";
-import template, { CONTROLLER_WIDTH } from "./template";
+import template, { CONTROLLER_WIDTH } from "./ControllerComponent.template";
 
 interface ListenerData {
   type: string;

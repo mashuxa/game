@@ -1,0 +1,6 @@
+app-component {
+  &::part(main-title) {
+    text-align: center;
+    font-size: 30px;
+  }
+}

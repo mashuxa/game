@@ -1,6 +1,6 @@
 import { Event } from "../../types/events";
 import { collectLetters, sortStringByAscending } from "../../utils/utils";
-import template from "./template";
+import template from "./App.template";
 
 const LEVEL_SETS_COUNT = 3;
 

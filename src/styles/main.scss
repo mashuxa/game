@@ -1,12 +1,8 @@
-.centred {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-shrink: 0;
-  text-transform: uppercase;
-  aspect-ratio: 1;
-  line-height: 100%;
-}
+@import '../components/App/App';
+@import '../components/TitleComponent/TitleComponent';
+@import '../components/WordComponent/WordComponent';
+@import '../components/ControllerComponent/ControllerComponent';
+@import '../components/SelectedLettersComponent/SelectedLettersComponent';
 
 html {
   color: white;
@@ -14,78 +10,4 @@ html {
   padding: 1vw;
   font-family: "VAG World Bold", sans-serif;
   font-size: 14px;
-}
-
-app-component {
-  &::part(app-wrapper) {
-    margin: auto;
-    user-select: none
-  }
-
-  &::part(main-title) {
-    text-align: center;
-    font-size: 30px;
-  }
-
-  &::part(word-cell) {
-    @extend .centred;
-
-    border-radius: 25%;
-    max-width: 72px;
-  }
-
-  &::part(word-cell-wrapper) {
-    display: flex;
-    flex-wrap: nowrap;
-    justify-content: center;
-  }
-
-  &::part(controller-selected-wrapper) {
-    display: flex;
-    justify-content: center;
-    align-items: start;
-    padding: 1.35rem 0;
-    min-height: 7.35rem;
-  }
-
-  &::part(controller-selected-letter) {
-    @extend .centred;
-
-    border-radius: 25%;
-    max-width: 42px;
-    color: #4D4D4D;
-    background-color: white;
-  }
-
-  &::part(controller-letters) {
-    position: relative;
-    border-radius: 50%;
-    margin: auto;
-    aspect-ratio: 1;
-    box-shadow: 0 0 0 0.85rem #3E4A68, inset 0 0 0 0.85rem #3E4A68;
-  }
-
-  &::part(controller-letter) {
-    --letter-width: 90px;
-
-    @extend .centred;
-
-    transition: transform 0.3s ease-in-out;
-    position: absolute;
-    top: calc(50% - var(--letter-width)/2);
-    left: calc(50% - var(--letter-width)/2);
-    cursor: pointer;
-    font-size: 4rem;
-    width: var(--letter-width);
-    border-radius: 50%;
-    color: #4D4D4D;
-    background-color: #FFF;
-    box-shadow: 0 5px 0 0 #9FA1A5;
-  }
-
-  &::part(controller-letter selected) {
-    color: #FFF;
-    background-color: #E870A5;
-    box-shadow: 0 5px 0 0 #B0638D;
-  }
 }

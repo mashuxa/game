@@ -17,9 +17,7 @@ export class WordComponent extends HTMLElement {
     return Number(this.getAttribute("max-size"));
   }
 
-  connectedCallback(): void {}
-
-  attributeChangedCallback(name: string, oldValue: string | null, newValue: string | null): void {
+  attributeChangedCallback(): void {
     this.render();
   }
 
