@@ -9,12 +9,13 @@ interface WordsSet {
 }
 
 export class App extends HTMLElement {
-  private titleNode: Element | null;
-  private readonly wordList: Element | null;
-  private controller: Element | null;
   public level: number;
   private wordSet: string[];
   private readonly visibleWords: Set<string>;
+
+  private titleNode: Element | null;
+  private readonly wordList: Element | null;
+  private controller: Element | null;
 
   constructor() {
     super();
@@ -47,12 +48,26 @@ export class App extends HTMLElement {
     this.renderWords();
   }
 
+  handleWordCheck(event: CustomEvent<string>): void {
+    if (this.wordSet.includes(event.detail)) {
+      this.visibleWords.add(event.detail);
+      this.renderWords();
+    }
+
+    if (this.wordSet.length === this.visibleWords.size) {
+      //todo: instead to show next screen
+      this.incrementLevel();
+    }
+  }
+
   connectedCallback(): void {
     this.addEventListener(Event.incrementLevel, this.incrementLevel);
+    this.addEventListener(Event.wordCheck, this.handleWordCheck as EventListener);
   }
 
   disconnectedCallback(): void {
     this.removeEventListener(Event.incrementLevel, this.incrementLevel);
+    this.removeEventListener(Event.wordCheck, this.handleWordCheck as EventListener);
   }
 
   renderWords(): void {

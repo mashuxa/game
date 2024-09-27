@@ -1,3 +1,4 @@
+import { Event } from "../../types/events";
 import { calculateCircleCoordinates, shuffleArray } from "../../utils/utils";
 import template, { CONTROLLER_WIDTH } from "./template";
 
@@ -7,24 +8,38 @@ interface ListenerData {
 }
 
 export class ControllerComponent extends HTMLElement {
-  private readonly controllerNode: Element | null;
   private letters: string[];
   private selected: HTMLElement[];
   private pointerdown: boolean;
+
   private letterListeners: Map<HTMLElement, ListenerData[]>;
+  private readonly controllerNode: Element | null;
+  private selectedLetters: Element | null;
 
   constructor() {
     super();
     this.letters = [];
     this.selected = [];
-    this.letterListeners = new Map();
-    this.innerHTML = template;
     this.pointerdown = false;
+    this.letterListeners = new Map();
+
+    this.innerHTML = template;
     this.controllerNode = this.querySelector(".controller-letters");
+    this.selectedLetters = this.querySelector("selected-letters-component");
   }
 
   static get observedAttributes(): string[] {
     return ["letters"];
+  }
+
+  get selectedWord(): string {
+    return this.selected.map((element) => element.innerText.toLowerCase()).join("");
+  }
+
+  dispatchWordCheck(): void {
+    const event = new CustomEvent(Event.wordCheck, { detail: this.selectedWord, composed: true });
+
+    this.dispatchEvent(event);
   }
 
   setPointerDown = (): void => {
@@ -32,11 +47,13 @@ export class ControllerComponent extends HTMLElement {
   };
   setPointerUp = (): void => {
     this.pointerdown = false;
-    //check existing words
+    this.dispatchWordCheck();
     this.selected.forEach((node) => node.part.remove("selected"));
     this.selected = [];
+    this.selectedLetters?.setAttribute("letters", "");
+    // todo: clear selected letters, animation???
   };
-  onPointerIn = ({ target }: Event): void => {
+  onPointerIn = ({ target }: PointerEvent): void => {
     const node = target as HTMLElement;
 
     if (this.pointerdown) {
@@ -46,13 +63,16 @@ export class ControllerComponent extends HTMLElement {
         this.selected.push(node);
         node.part.add("selected");
       }
+
+      this.selectedLetters?.setAttribute("letters", this.selectedWord);
     }
   };
-  onPointerDown = ({ target }: Event): void => {
+  onPointerDown = ({ target }: PointerEvent): void => {
     const node = target as HTMLElement;
 
     this.selected.push(node);
     node.part.add("selected");
+    this.selectedLetters?.setAttribute("letters", this.selectedWord);
   };
 
   addListeners(): void {
@@ -93,8 +113,8 @@ export class ControllerComponent extends HTMLElement {
       const letterNode = document.createElement("div");
       const { x, y } = calculateCircleCoordinates(CONTROLLER_WIDTH / 2, index / arr.length);
       const listenersData = [
-        { type: "pointerdown", listener: this.onPointerDown },
-        { type: "pointerenter", listener: this.onPointerIn },
+        { type: "pointerdown", listener: this.onPointerDown as EventListener },
+        { type: "pointerenter", listener: this.onPointerIn as EventListener },
       ];
 
       this.letterListeners.set(letterNode, listenersData);

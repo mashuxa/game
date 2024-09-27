@@ -1,3 +1,5 @@
+import { cellMarginPx, maxAppWidth } from "../../styles/theme";
+
 export class SelectedLettersComponent extends HTMLElement {
   constructor() {
     super();
@@ -21,10 +23,11 @@ export class SelectedLettersComponent extends HTMLElement {
     wrapper.setAttribute("part", "controller-selected-wrapper");
     this.letters.forEach((letter) => {
       const cell = document.createElement("div");
-      const cellWidth = `min(100vw, 100vh, 640px)/${this.letters.length} - 6px`;
+      const cellWidth = `min(100vw, 100vh, ${maxAppWidth})/${this.letters.length} - 6px`;
 
       cell.setAttribute("part", "controller-selected-letter");
       cell.style.width = `calc(${cellWidth})`;
+      cell.style.margin = `${cellMarginPx}px`;
       cell.innerHTML = letter;
       wrapper.appendChild(cell);
     });
