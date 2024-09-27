@@ -13,39 +13,51 @@ export class App extends HTMLElement {
   private wordSet: string[];
   private readonly visibleWords: Set<string>;
 
-  private titleNode: Element | null;
-  private readonly wordList: Element | null;
-  private controller: Element | null;
-
   constructor() {
     super();
     this.level = 1;
     this.wordSet = [];
     this.visibleWords = new Set();
 
-    this.attachShadow({ mode: "open" }).innerHTML = template;
-    void this.updateWordSet();
-
-    this.titleNode = this.shadowRoot && this.shadowRoot.querySelector("title-component");
-    this.wordList = this.shadowRoot && this.shadowRoot.querySelector(".word-list");
-    this.controller = this.shadowRoot && this.shadowRoot.querySelector("controller-component");
+    this.attachShadow({ mode: "open" });
+    void this.setupLevel();
   }
 
-  incrementLevel(): void {
+  handleIncrementLevel(): void {
     this.level += 1;
-    this.titleNode?.setAttribute("level", this.level.toString());
-    void this.updateWordSet();
+    void this.setupLevel();
+  }
+
+  async setupLevel(): Promise<void> {
+    await this.updateWordSet();
+
+    if (this.shadowRoot) {
+      this.shadowRoot.innerHTML = template;
+
+      const title = this.shadowRoot.querySelector("title-component");
+      const controller = this.shadowRoot.querySelector("controller-component");
+
+      title?.setAttribute("level", this.level.toString());
+      controller?.setAttribute("letters", collectLetters(this.wordSet).join(""));
+      this.renderWords();
+    }
   }
 
   async updateWordSet(): Promise<void> {
     const fileName = this.level % LEVEL_SETS_COUNT || LEVEL_SETS_COUNT;
-    //todo: add error handling
-    const response = await fetch(`../levels/${fileName}.json`);
-    const { words } = (await response.json()) as WordsSet;
 
-    this.wordSet = words.sort(sortStringByAscending);
-    this.controller?.setAttribute("letters", collectLetters(words).join(""));
-    this.renderWords();
+    try {
+      const response = await fetch(`../levels/${fileName}.json`);
+
+      if (!response.ok) throw Error();
+
+      const { words } = (await response.json()) as WordsSet;
+
+      this.wordSet = words.sort(sortStringByAscending);
+    } catch (e) {
+      alert("Упс... Мы скоро все исправим. Попробуйте снова через несколько минут!");
+      console.error(e);
+    }
   }
 
   handleWordCheck(event: CustomEvent<string>): void {
@@ -54,35 +66,37 @@ export class App extends HTMLElement {
       this.renderWords();
     }
 
-    if (this.wordSet.length === this.visibleWords.size) {
-      //todo: instead to show next screen
-      this.incrementLevel();
+    if (this.wordSet.length === this.visibleWords.size && this.shadowRoot) {
+      this.visibleWords.clear();
+      this.shadowRoot.innerHTML = `<win-screen-component level="${this.level}"></win-screen-component>`;
     }
   }
 
   connectedCallback(): void {
-    this.addEventListener(Event.incrementLevel, this.incrementLevel);
+    this.addEventListener(Event.incrementLevel, this.handleIncrementLevel);
     this.addEventListener(Event.wordCheck, this.handleWordCheck as EventListener);
   }
 
   disconnectedCallback(): void {
-    this.removeEventListener(Event.incrementLevel, this.incrementLevel);
+    this.removeEventListener(Event.incrementLevel, this.handleIncrementLevel);
     this.removeEventListener(Event.wordCheck, this.handleWordCheck as EventListener);
   }
 
   renderWords(): void {
-    if (!this.shadowRoot || !this.wordList) return;
+    const wordList = this.shadowRoot && this.shadowRoot.querySelector(".word-list");
+
+    if (!this.shadowRoot || !wordList) return;
 
     const maxWordSize = this.wordSet[this.wordSet.length - 1].length;
 
-    this.wordList.innerHTML = "";
+    wordList.innerHTML = "";
     this.wordSet.forEach((word) => {
       const element = document.createElement("word-component");
       const data = this.visibleWords.has(word) ? word : word.replace(/./g, " ");
 
       element.setAttribute("data", data);
       element.setAttribute("max-size", maxWordSize.toString());
-      this.wordList?.appendChild(element);
+      wordList.appendChild(element);
     });
   }
 }

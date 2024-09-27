@@ -1,0 +1,39 @@
+@use '../../styles/common';
+
+app-component {
+  &::part(win-screen-wrapper) {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+    text-align: center;
+    min-height: calc(100vh - 2rem);
+  }
+
+  &::part(win-screen-title) {
+    font-size: 2.65rem;
+    margin: 0;
+    line-height: 1.2;
+
+  }
+
+  &::part(win-screen-subtitle) {
+    font-size: 3.8rem;
+    margin: 0;
+    line-height: 1.2;
+  }
+
+  &::part(win-screen-button) {
+    cursor: pointer;
+    font-size: 2.65rem;
+    line-height: 2.4;
+    width: 100%;
+    max-width: 330px;
+    border-radius: 4rem;
+    color: #FFF;
+    background-color: #62BE64;
+    box-shadow: 0 5px 0 0 #518854;
+    font-family: inherit;
+    border: none;
+  }
+}
