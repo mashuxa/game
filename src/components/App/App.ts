@@ -1,8 +1,7 @@
 import { Event } from "../../types/events";
 import { collectLetters, sortStringByAscending } from "../../utils/utils";
 import template from "./App.template";
-
-const LEVEL_SETS_COUNT = 3;
+import { LEVEL_SETS_COUNT, LS_KEY_LEVEL, LS_KEY_WORDS } from "./contants";
 
 interface WordsSet {
   words: string[];
@@ -11,21 +10,32 @@ interface WordsSet {
 export class App extends HTMLElement {
   public level: number;
   private wordSet: string[];
-  private readonly visibleWords: Set<string>;
+  private visibleWords: Set<string>;
 
   constructor() {
     super();
+
     this.level = 1;
     this.wordSet = [];
     this.visibleWords = new Set();
 
     this.attachShadow({ mode: "open" });
+    this.restoreData();
     void this.setupLevel();
+  }
+
+  restoreData(): void {
+    const prevLevel = localStorage.getItem(LS_KEY_LEVEL);
+    const prevWords = localStorage.getItem(LS_KEY_WORDS);
+
+    if (prevLevel) this.level = Number(prevLevel);
+    if (prevWords) this.visibleWords = new Set(prevWords.split(","));
   }
 
   handleIncrementLevel(): void {
     this.level += 1;
     void this.setupLevel();
+    localStorage.setItem(LS_KEY_LEVEL, String(this.level));
   }
 
   async setupLevel(): Promise<void> {
@@ -64,6 +74,7 @@ export class App extends HTMLElement {
     if (this.wordSet.includes(event.detail)) {
       this.visibleWords.add(event.detail);
       this.renderWords();
+      localStorage.setItem(LS_KEY_WORDS, Array.from(this.visibleWords).join());
     }
 
     if (this.wordSet.length === this.visibleWords.size && this.shadowRoot) {
