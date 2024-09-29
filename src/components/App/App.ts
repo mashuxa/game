@@ -42,7 +42,7 @@ export class App extends HTMLElement {
     const fileName = this.level % LEVEL_SETS_COUNT || LEVEL_SETS_COUNT;
 
     try {
-      const response = await fetch(`../levels/${fileName}.json`);
+      const response = await fetch(`./levels/${fileName}.json`);
 
       if (!response.ok) throw Error();
 
