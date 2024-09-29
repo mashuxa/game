@@ -1,4 +1,4 @@
-export enum Event {
+export enum AppEvent {
   incrementLevel = "increment-level",
   wordCheck = "word-check",
   restoreGame = "restore-game",

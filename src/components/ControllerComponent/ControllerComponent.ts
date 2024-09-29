@@ -1,4 +1,4 @@
-import { Event } from "../../types/events";
+import { AppEvent } from "../../types/events";
 import { calculateCirclePercentCoordinates, shuffleArray } from "../../utils/utils";
 import template from "./ControllerComponent.template";
 
@@ -9,6 +9,7 @@ export class ControllerComponent extends HTMLElement {
 
   private controllerNode: Element | null;
   private selectedLetters: Element | null;
+  private touchedLetter: Element | null;
 
   constructor() {
     super();
@@ -18,6 +19,7 @@ export class ControllerComponent extends HTMLElement {
 
     this.controllerNode = null;
     this.selectedLetters = null;
+    this.touchedLetter = null;
   }
 
   static get observedAttributes(): string[] {
@@ -29,7 +31,7 @@ export class ControllerComponent extends HTMLElement {
   }
 
   dispatchWordCheck(): void {
-    const event = new CustomEvent(Event.wordCheck, { detail: this.selectedWord, bubbles: true });
+    const event = new CustomEvent(AppEvent.wordCheck, { detail: this.selectedWord, bubbles: true });
 
     this.dispatchEvent(event);
   }
@@ -65,6 +67,17 @@ export class ControllerComponent extends HTMLElement {
     node.part.add("selected");
     this.selectedLetters?.setAttribute("letters", this.selectedWord);
   };
+  handleTouch = (event: TouchEvent): void => {
+    const root = this.getRootNode() as ShadowRoot;
+    const { clientX, clientY } = event.touches[0];
+    const element = root.elementFromPoint(clientX, clientY);
+    const isControllerElement = element?.classList.contains("controller-letter");
+
+    if (isControllerElement && element !== this.touchedLetter) {
+      this.touchedLetter = element;
+      this.onPointerIn({ target: element } as PointerEvent);
+    }
+  };
 
   connectedCallback(): void {
     this.innerHTML = template;
@@ -72,7 +85,9 @@ export class ControllerComponent extends HTMLElement {
     this.selectedLetters = this.querySelector("selected-letters-component");
 
     document.addEventListener("pointerdown", this.setPointerDown);
-    document.addEventListener("pointerup", this.setPointerUp);
+    document.addEventListener("mouseup", this.setPointerUp);
+    document.addEventListener("touchend", this.setPointerUp);
+    document.addEventListener("touchmove", this.handleTouch);
   }
   attributeChangedCallback(name: string, oldValue: string, newValue: string): void {
     if (name === "letters" && oldValue !== newValue) {
@@ -91,10 +106,11 @@ export class ControllerComponent extends HTMLElement {
       const { x, y } = calculateCirclePercentCoordinates(index / arr.length);
 
       letterNode.addEventListener("pointerdown", this.onPointerDown as EventListener);
-      letterNode.addEventListener("pointerenter", this.onPointerIn as EventListener);
+      letterNode.addEventListener("mouseenter", this.onPointerIn as EventListener);
 
       letterNode.innerHTML = letter;
       letterNode.setAttribute("part", "controller-letter");
+      letterNode.classList.add("controller-letter");
       letterNode.style.left = "50%";
       letterNode.style.top = "50%";
 

@@ -1,4 +1,4 @@
-import { BroadcastEvent, Event } from "../../types/events";
+import { AppEvent, BroadcastEvent } from "../../types/events";
 import { collectLetters, sortStringByAscending } from "../../utils/utils";
 import template from "./App.template";
 import { LEVEL_SETS_COUNT, LS_KEY_LEVEL, LS_KEY_WORDS } from "./contants";
@@ -106,9 +106,9 @@ export class App extends HTMLElement {
   };
 
   connectedCallback(): void {
-    this.shadowRoot?.addEventListener(Event.incrementLevel, this.incrementLevel);
-    this.shadowRoot?.addEventListener(Event.wordCheck, this.checkWord as EventListener);
-    this.shadowRoot?.addEventListener(Event.restoreGame, this.handleBroadcastRestore);
+    this.shadowRoot?.addEventListener(AppEvent.incrementLevel, this.incrementLevel);
+    this.shadowRoot?.addEventListener(AppEvent.wordCheck, this.checkWord as EventListener);
+    this.shadowRoot?.addEventListener(AppEvent.restoreGame, this.handleBroadcastRestore);
     this.broadcastChannel.postMessage({ event: BroadcastEvent.showRestoreModal });
     this.broadcastChannel.onmessage = this.onBroadcastChannelMessage;
   }

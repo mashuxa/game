@@ -1,5 +1,5 @@
 import { maxAppWidth } from "../../styles/theme";
-import { Event } from "../../types/events";
+import { AppEvent } from "../../types/events";
 
 export class WinScreenComponent extends HTMLElement {
   constructor() {
@@ -7,7 +7,7 @@ export class WinScreenComponent extends HTMLElement {
   }
 
   handleClick(): void {
-    const event = new CustomEvent(Event.incrementLevel, { bubbles: true });
+    const event = new CustomEvent(AppEvent.incrementLevel, { bubbles: true });
 
     this.dispatchEvent(event);
   }

@@ -1,4 +1,4 @@
-import { Event } from "../../types/events";
+import { AppEvent } from "../../types/events";
 import template from "./RestoreModalComponent.template";
 
 export class RestoreModalComponent extends HTMLElement {
@@ -11,7 +11,7 @@ export class RestoreModalComponent extends HTMLElement {
   }
 
   dispatchBroadcastEvent(): void {
-    const event = new CustomEvent(Event.restoreGame, { bubbles: true });
+    const event = new CustomEvent(AppEvent.restoreGame, { bubbles: true });
 
     this.dispatchEvent(event);
   }
