@@ -3,5 +3,5 @@ export default {
   collectCoverage: true,
   coverageDirectory: "coverage",
   testEnvironment: "jest-environment-jsdom",
-  collectCoverageFrom: ["src/**/*.{js,mjs,ts,tsx}", "!src/**/*.d.ts", "!src/types/*"],
+  collectCoverageFrom: ["src/**/*.{js,mjs,ts,tsx}", "!src/**/*.d.ts", "!src/**/*.template.ts", "!src/types/*"],
 };

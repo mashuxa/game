@@ -1,8 +1,9 @@
+import { throttle } from "lodash";
+import { COLUMN_GAP, WORD_CELL_MAX_SIZE } from "../../styles/theme";
 import { AppEvent, BroadcastEvent } from "../../types/events";
 import { collectLetters, sortStringByAscending } from "../../utils/utils";
-import template from "./App.template";
+import getTemplate from "./App.template";
 import { LEVEL_SETS_COUNT, LS_KEY_LEVEL, LS_KEY_WORDS } from "./contants";
-
 interface WordsSet {
   words: string[];
 }
@@ -22,7 +23,7 @@ export class App extends HTMLElement {
     this.broadcastChannel = new BroadcastChannel("main");
 
     this.attachShadow({ mode: "open" });
-    this.restoreGame();
+    void this.restoreGame();
   }
 
   restoreData(): void {
@@ -33,9 +34,10 @@ export class App extends HTMLElement {
     if (prevWords) this.visibleWords = new Set(prevWords.split(","));
   }
 
-  restoreGame(): void {
+  async restoreGame(): Promise<void> {
     this.restoreData();
-    void this.setupLevel();
+    await this.setupLevel();
+    this.checkAndHandleLevelCompletion();
   }
 
   async updateWordSet(): Promise<void> {
@@ -47,8 +49,9 @@ export class App extends HTMLElement {
       if (!response.ok) throw Error();
 
       const { words } = (await response.json()) as WordsSet;
+      const uniqWords = Array.from(new Set(words));
 
-      this.wordSet = words.sort(sortStringByAscending);
+      this.wordSet = uniqWords.sort(sortStringByAscending);
     } catch (e) {
       alert("Упс... Мы скоро все исправим. Попробуйте снова через несколько минут!");
       console.error(e);
@@ -59,12 +62,10 @@ export class App extends HTMLElement {
     await this.updateWordSet();
 
     if (this.shadowRoot) {
-      this.shadowRoot.innerHTML = template;
+      this.shadowRoot.innerHTML = getTemplate(this.level);
 
-      const title = this.shadowRoot.querySelector("title-component");
       const controller = this.shadowRoot.querySelector("controller-component");
 
-      title?.setAttribute("level", this.level.toString());
       controller?.setAttribute("letters", collectLetters(this.wordSet).join(""));
       this.renderWords();
     }
@@ -77,6 +78,13 @@ export class App extends HTMLElement {
     localStorage.removeItem(LS_KEY_WORDS);
   };
 
+  checkAndHandleLevelCompletion(): void {
+    if (this.wordSet.length === this.visibleWords.size && this.shadowRoot) {
+      this.visibleWords.clear();
+      this.shadowRoot.innerHTML = `<win-screen-component level="${this.level}"></win-screen-component>`;
+    }
+  }
+
   checkWord = (event: CustomEvent<string>): void => {
     const word = event.detail;
 
@@ -86,10 +94,7 @@ export class App extends HTMLElement {
       localStorage.setItem(LS_KEY_WORDS, Array.from(this.visibleWords).join());
     }
 
-    if (this.wordSet.length === this.visibleWords.size && this.shadowRoot) {
-      this.visibleWords.clear();
-      this.shadowRoot.innerHTML = `<win-screen-component level="${this.level}"></win-screen-component>`;
-    }
+    this.checkAndHandleLevelCompletion();
   };
 
   onBroadcastChannelMessage = (event: MessageEvent<{ event: BroadcastEvent }>): void => {
@@ -106,6 +111,9 @@ export class App extends HTMLElement {
   };
 
   connectedCallback(): void {
+    const throttledResize = throttle(() => this.renderWords(), 300);
+
+    window.addEventListener("resize", throttledResize);
     this.shadowRoot?.addEventListener(AppEvent.incrementLevel, this.incrementLevel);
     this.shadowRoot?.addEventListener(AppEvent.wordCheck, this.checkWord as EventListener);
     this.shadowRoot?.addEventListener(AppEvent.restoreGame, this.handleBroadcastRestore);
@@ -114,20 +122,26 @@ export class App extends HTMLElement {
   }
 
   renderWords(): void {
-    const wordList = this.shadowRoot && this.shadowRoot.querySelector(".word-list");
+    const wordList = this.shadowRoot && (this.shadowRoot.querySelector(".word-list") as HTMLElement);
 
     if (!this.shadowRoot || !wordList) return;
 
     const maxWordSize = this.wordSet[this.wordSet.length - 1].length;
+    const rowsGap = COLUMN_GAP * (maxWordSize - 1);
+    const cellHeight = `calc(100%/${this.wordSet.length})`;
+    const cellWidth = `${(wordList.offsetWidth - rowsGap) / maxWordSize}px`;
+    const rowHeight = `min(${cellHeight}, ${cellWidth}, ${WORD_CELL_MAX_SIZE}, 11.25vw)`;
 
     wordList.innerHTML = "";
+    wordList.style.gridTemplateRows = `repeat(${this.wordSet.length}, minmax(0, ${rowHeight}))`;
+
     this.wordSet.forEach((word) => {
       const element = document.createElement("word-component");
       const data = this.visibleWords.has(word) ? word : word.replace(/./g, " ");
 
       element.setAttribute("data", data);
-      element.setAttribute("max-size", maxWordSize.toString());
       wordList.appendChild(element);
+      wordList.style.fontSize = `clamp(1rem, ${element.offsetHeight * 0.583}px, 42px)`;
     });
   }
 }

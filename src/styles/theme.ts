@@ -1,6 +1,6 @@
-export const light = "#FFF";
-export const success = "#63BE64";
-export const maxAppWidth = "640px";
+export const COLOR_LIGHT = "#FFF";
+export const COLOR_SUCCESS = "#63BE64";
+export const MAX_APP_WIDTH = "640px";
 
-export const cellMarginPx = 3;
-export const wordCellMaxSize = "42px";
+export const WORD_CELL_MAX_SIZE = "72px";
+export const COLUMN_GAP = 6;

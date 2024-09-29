@@ -69,4 +69,12 @@ describe("Utility Functions", () => {
     expect(x).toBe(100);
     expect(y).toBe(50);
   });
+
+  test("calculateCircleCoordinates should return right coordinates for segment", () => {
+    const elementPosition = 1 / 4;
+    const { x, y } = calculateCirclePercentCoordinates(elementPosition);
+
+    expect(x).toBe(100);
+    expect(y).toBe(50);
+  });
 });

@@ -1,3 +1,4 @@
+import { COLUMN_GAP } from "../../styles/theme";
 import { AppEvent } from "../../types/events";
 import { calculateCirclePercentCoordinates, shuffleArray } from "../../utils/utils";
 import template from "./ControllerComponent.template";
@@ -7,6 +8,7 @@ export class ControllerComponent extends HTMLElement {
   private selected: HTMLElement[];
   private pointerdown: boolean;
 
+  private root: ShadowRoot;
   private controllerNode: Element | null;
   private selectedLetters: Element | null;
   private touchedLetter: Element | null;
@@ -17,6 +19,7 @@ export class ControllerComponent extends HTMLElement {
     this.selected = [];
     this.pointerdown = false;
 
+    this.root = this.getRootNode() as ShadowRoot;
     this.controllerNode = null;
     this.selectedLetters = null;
     this.touchedLetter = null;
@@ -68,9 +71,8 @@ export class ControllerComponent extends HTMLElement {
     this.selectedLetters?.setAttribute("letters", this.selectedWord);
   };
   handleTouch = (event: TouchEvent): void => {
-    const root = this.getRootNode() as ShadowRoot;
     const { clientX, clientY } = event.touches[0];
-    const element = root.elementFromPoint(clientX, clientY);
+    const element = this.root.elementFromPoint(clientX, clientY);
     const isControllerElement = element?.classList.contains("controller-letter");
 
     if (isControllerElement && element !== this.touchedLetter) {
@@ -111,6 +113,7 @@ export class ControllerComponent extends HTMLElement {
       letterNode.innerHTML = letter;
       letterNode.setAttribute("part", "controller-letter");
       letterNode.classList.add("controller-letter");
+      letterNode.style.maxWidth = `calc((3.14 * 100%)/${arr.length} - ${COLUMN_GAP}px)`;
       letterNode.style.left = "50%";
       letterNode.style.top = "50%";
 

@@ -1,4 +1,4 @@
-import { maxAppWidth } from "../../styles/theme";
+import { MAX_APP_WIDTH } from "../../styles/theme";
 import { AppEvent } from "../../types/events";
 
 export class WinScreenComponent extends HTMLElement {
@@ -19,7 +19,7 @@ export class WinScreenComponent extends HTMLElement {
 
   render(): void {
     this.innerHTML = ` 
-      <main part="win-screen-wrapper" style="max-width: ${maxAppWidth}">
+      <main part="win-screen-wrapper" style="max-width: ${MAX_APP_WIDTH}">
           <div>
             <h1 part="win-screen-title">Уровень ${this.getAttribute("level")} пройден</h1>
             <p part="win-screen-subtitle">Изумительно!</p>

@@ -4,7 +4,7 @@ export const mapLettersInWord = (word: string): Map<string, number> =>
   word.split("").reduce<Map<string, number>>((acc, letter) => {
     const prevValue = acc.get(letter) || 0;
 
-    acc.set(letter, prevValue + 1);
+    acc.set(letter.toLowerCase(), prevValue + 1);
 
     return acc;
   }, new Map());
