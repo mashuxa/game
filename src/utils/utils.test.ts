@@ -1,5 +1,5 @@
 import {
-  calculateCircleCoordinates,
+  calculateCirclePercentCoordinates,
   collectLetters,
   getRandomValue,
   joinLettersMaps,
@@ -63,11 +63,10 @@ describe("Utility Functions", () => {
   });
 
   test("calculateCircleCoordinates should return right coordinates for segment", () => {
-    const radius = 10;
-    const firstTopElement = 1 / 4;
-    const result = calculateCircleCoordinates(radius, firstTopElement);
+    const elementPosition = 1 / 4;
+    const { x, y } = calculateCirclePercentCoordinates(elementPosition);
 
-    expect(result.x).toBeCloseTo(10);
-    expect(result.y).toBeCloseTo(0);
+    expect(x).toBe(100);
+    expect(y).toBe(50);
   });
 });

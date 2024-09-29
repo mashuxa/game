@@ -1,6 +1,6 @@
 import { Event } from "../../types/events";
-import { calculateCircleCoordinates, shuffleArray } from "../../utils/utils";
-import template, { CONTROLLER_WIDTH } from "./ControllerComponent.template";
+import { calculateCirclePercentCoordinates, shuffleArray } from "../../utils/utils";
+import template from "./ControllerComponent.template";
 
 export class ControllerComponent extends HTMLElement {
   private letters: string[];
@@ -88,17 +88,21 @@ export class ControllerComponent extends HTMLElement {
     this.controllerNode.innerHTML = "";
     this.letters.forEach((letter, index, arr) => {
       const letterNode = document.createElement("div");
-      const { x, y } = calculateCircleCoordinates(CONTROLLER_WIDTH / 2, index / arr.length);
+      const { x, y } = calculateCirclePercentCoordinates(index / arr.length);
 
       letterNode.addEventListener("pointerdown", this.onPointerDown as EventListener);
       letterNode.addEventListener("pointerenter", this.onPointerIn as EventListener);
 
       letterNode.innerHTML = letter;
       letterNode.setAttribute("part", "controller-letter");
+      letterNode.style.left = "50%";
+      letterNode.style.top = "50%";
+
       this.controllerNode?.appendChild(letterNode);
 
       setTimeout(() => {
-        letterNode.style.transform = `translate(${x}px, ${y}px)`;
+        letterNode.style.left = `${x}%`;
+        letterNode.style.top = `${y}%`;
       }, 100);
     });
   }

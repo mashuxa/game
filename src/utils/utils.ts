@@ -48,10 +48,11 @@ export const shuffleArray = <T>(array: T[]): T[] => {
   );
 };
 
-export const calculateCircleCoordinates = (radius: number, fractionPosition: number): { x: number; y: number } => {
+export const calculateCirclePercentCoordinates = (fractionPosition: number): { x: number; y: number } => {
   const angle = fractionPosition * 2 * Math.PI - Math.PI / 2;
-  const x = Math.cos(angle) * radius;
-  const y = Math.sin(angle) * radius;
+  const radiusPercent = 50;
+  const x = Math.cos(angle) * radiusPercent + radiusPercent;
+  const y = Math.sin(angle) * radiusPercent + radiusPercent;
 
   return { x, y };
 };
