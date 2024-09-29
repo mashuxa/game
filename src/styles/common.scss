@@ -7,3 +7,17 @@
   aspect-ratio: 1;
   line-height: 100%;
 }
+
+.button {
+  cursor: pointer;
+  font-size: 2.65rem;
+  line-height: 2.4;
+  width: 100%;
+  max-width: 330px;
+  border-radius: 4rem;
+  color: #FFF;
+  background-color: #62BE64;
+  box-shadow: 0 5px 0 0 #518854;
+  font-family: inherit;
+  border: none;
+}

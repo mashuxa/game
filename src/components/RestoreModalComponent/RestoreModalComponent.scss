@@ -1,0 +1,82 @@
+@use '../../styles/common';
+
+app-component {
+  &::part(restore-modal) {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    width: 100%;
+    background: rgba(0, 0, 0, 0.7);
+  }
+
+  &::part(restore-modal-wrapper) {
+    --shift-height: 20px;
+    --shift-width: 14px;
+
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: calc(100% - 2rem);
+    max-width: 530px;
+    background-color: #FFF;
+    border-radius: 2.8rem;
+    text-align: center;
+    padding: 0 1.8rem 1.8rem;
+  }
+
+  &::part(restore-modal-title-wrapper) {
+    position: relative;
+    max-width: 350px;
+    margin: calc(-1 * var(--shift-height)) auto;
+
+    @media (min-width: 461px) {
+      &::before,
+      &::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        border-bottom: var(--shift-height) solid #994625;
+      }
+
+      &::before {
+        left: calc(-1 * var(--shift-width));
+        border-left: var(--shift-width) solid transparent;
+      }
+
+      &::after {
+        right: calc(-1 * var(--shift-width));
+        border-right: var(--shift-width) solid transparent;
+      }
+    }
+  }
+
+  &::part(restore-modal-title-shadow) {
+    clip-path: url(#mask);
+    background-color: #C7572B;
+    padding-bottom: 6px;
+  }
+
+  &::part(restore-modal-title) {
+    clip-path: url(#mask);
+    font-size: 2.857rem;
+    background-color: #EC6B3A;
+    margin: 0;
+    line-height: 0.9;
+    padding: 0.8rem 0.8rem 1.8rem;
+    display: block;
+    border-bottom-left-radius: 2rem;
+    border-bottom-right-radius: 2rem;
+    width: 100%;
+  }
+
+  &::part(restore-modal-text) {
+    font-size: 2.285rem;
+    line-height: 1.25;
+    color: #4C4C4C;
+  }
+
+  &::part(restore-modal-button) {
+    @extend .button;
+  }
+}

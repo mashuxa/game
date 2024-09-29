@@ -1,5 +1,6 @@
 import "./components/App/App";
 import "./components/ControllerComponent/ControllerComponent";
+import "./components/RestoreModalComponent/RestoreModalComponent";
 import "./components/SelectedLettersComponent/SelectedLettersComponent";
 import "./components/TitleComponent/TitleComponent";
 import "./components/WinScreenComponent/WinScreenComponent";

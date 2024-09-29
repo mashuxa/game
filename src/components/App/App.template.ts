@@ -2,6 +2,10 @@ import { maxAppWidth } from "../../styles/theme";
 
 export default `
     <style>
+        * {
+          box-sizing: border-box;
+        }
+
         @keyframes fadeIn {
           to {
             opacity: 1;

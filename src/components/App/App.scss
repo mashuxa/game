@@ -1,9 +1,15 @@
 @use '../../styles/common';
 
 app-component {
+  &::part(*) {
+    box-sizing: border-box;
+  }
+
   &::part(app-wrapper) {
+    padding: 1rem;
     margin: auto;
-    user-select: none
+    user-select: none;
+    box-sizing: border-box;
   }
 
   &::part(word-list) {

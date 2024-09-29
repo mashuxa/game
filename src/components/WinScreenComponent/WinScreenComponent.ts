@@ -4,30 +4,29 @@ import { Event } from "../../types/events";
 export class WinScreenComponent extends HTMLElement {
   constructor() {
     super();
-
-    this.innerHTML = ` 
-    <main part="win-screen-wrapper" style="max-width: ${maxAppWidth}">
-        <div>
-          <h1 part="win-screen-title">Уровень ${this.getAttribute("level")} пройден</h1>
-          <p part="win-screen-subtitle">Изумительно!</p>
-        </div>
-        <button part="win-screen-button">Уровень ${Number(this.getAttribute("level")) + 1}</button>
-    </main>
-    `;
   }
 
   handleClick(): void {
-    const event = new CustomEvent(Event.incrementLevel, { composed: true });
+    const event = new CustomEvent(Event.incrementLevel, { bubbles: true });
 
     this.dispatchEvent(event);
   }
 
   connectedCallback(): void {
+    this.render();
     this.addEventListener("pointerdown", this.handleClick);
   }
 
-  disconnectedCallback(): void {
-    this.removeEventListener("pointerdown", this.handleClick);
+  render(): void {
+    this.innerHTML = ` 
+      <main part="win-screen-wrapper" style="max-width: ${maxAppWidth}">
+          <div>
+            <h1 part="win-screen-title">Уровень ${this.getAttribute("level")} пройден</h1>
+            <p part="win-screen-subtitle">Изумительно!</p>
+          </div>
+          <button part="win-screen-button">Уровень ${Number(this.getAttribute("level")) + 1}</button>
+      </main>
+    `;
   }
 }
 

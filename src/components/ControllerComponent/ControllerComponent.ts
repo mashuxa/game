@@ -2,18 +2,12 @@ import { Event } from "../../types/events";
 import { calculateCircleCoordinates, shuffleArray } from "../../utils/utils";
 import template, { CONTROLLER_WIDTH } from "./ControllerComponent.template";
 
-interface ListenerData {
-  type: string;
-  listener: EventListener;
-}
-
 export class ControllerComponent extends HTMLElement {
   private letters: string[];
   private selected: HTMLElement[];
   private pointerdown: boolean;
 
-  private letterListeners: Map<HTMLElement, ListenerData[]>;
-  private readonly controllerNode: Element | null;
+  private controllerNode: Element | null;
   private selectedLetters: Element | null;
 
   constructor() {
@@ -21,11 +15,9 @@ export class ControllerComponent extends HTMLElement {
     this.letters = [];
     this.selected = [];
     this.pointerdown = false;
-    this.letterListeners = new Map();
 
-    this.innerHTML = template;
-    this.controllerNode = this.querySelector(".controller-letters");
-    this.selectedLetters = this.querySelector("selected-letters-component");
+    this.controllerNode = null;
+    this.selectedLetters = null;
   }
 
   static get observedAttributes(): string[] {
@@ -37,7 +29,7 @@ export class ControllerComponent extends HTMLElement {
   }
 
   dispatchWordCheck(): void {
-    const event = new CustomEvent(Event.wordCheck, { detail: this.selectedWord, composed: true });
+    const event = new CustomEvent(Event.wordCheck, { detail: this.selectedWord, bubbles: true });
 
     this.dispatchEvent(event);
   }
@@ -51,7 +43,6 @@ export class ControllerComponent extends HTMLElement {
     this.selected.forEach((node) => node.part.remove("selected"));
     this.selected = [];
     this.selectedLetters?.setAttribute("letters", "");
-    // todo: clear selected letters, animation???
   };
   onPointerIn = ({ target }: PointerEvent): void => {
     const node = target as HTMLElement;
@@ -75,27 +66,13 @@ export class ControllerComponent extends HTMLElement {
     this.selectedLetters?.setAttribute("letters", this.selectedWord);
   };
 
-  addListeners(): void {
+  connectedCallback(): void {
+    this.innerHTML = template;
+    this.controllerNode = this.querySelector(".controller-letters");
+    this.selectedLetters = this.querySelector("selected-letters-component");
+
     document.addEventListener("pointerdown", this.setPointerDown);
     document.addEventListener("pointerup", this.setPointerUp);
-  }
-  removeListeners(): void {
-    document.removeEventListener("pointerdown", this.setPointerDown);
-    document.removeEventListener("pointerup", this.setPointerUp);
-
-    this.letterListeners.forEach((listeners, element) => {
-      listeners.forEach(({ type, listener }) => {
-        element.removeEventListener(type, listener);
-      });
-    });
-    this.letterListeners.clear();
-  }
-
-  connectedCallback(): void {
-    this.addListeners();
-  }
-  disconnectedCallback(): void {
-    this.removeListeners();
   }
   attributeChangedCallback(name: string, oldValue: string, newValue: string): void {
     if (name === "letters" && oldValue !== newValue) {
@@ -112,13 +89,9 @@ export class ControllerComponent extends HTMLElement {
     this.letters.forEach((letter, index, arr) => {
       const letterNode = document.createElement("div");
       const { x, y } = calculateCircleCoordinates(CONTROLLER_WIDTH / 2, index / arr.length);
-      const listenersData = [
-        { type: "pointerdown", listener: this.onPointerDown as EventListener },
-        { type: "pointerenter", listener: this.onPointerIn as EventListener },
-      ];
 
-      this.letterListeners.set(letterNode, listenersData);
-      listenersData.forEach(({ type, listener }) => letterNode.addEventListener(type, listener));
+      letterNode.addEventListener("pointerdown", this.onPointerDown as EventListener);
+      letterNode.addEventListener("pointerenter", this.onPointerIn as EventListener);
 
       letterNode.innerHTML = letter;
       letterNode.setAttribute("part", "controller-letter");
