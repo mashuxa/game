@@ -56,3 +56,11 @@ export const calculateCirclePercentCoordinates = (fractionPosition: number): { x
 
   return { x, y };
 };
+
+export const getCenterCoordinates = (node: HTMLElement): { x: number; y: number } => {
+  const rect = node.getBoundingClientRect();
+  const x = rect.left + rect.width / 2;
+  const y = rect.top + rect.height / 2;
+
+  return { x, y };
+};

@@ -39,4 +39,12 @@ app-component {
     background-color: #E870A5;
     box-shadow: 0 var(--shadow-width-letter) 0 0 #B0638D;
   }
+
+  &::part(controller-line) {
+    pointer-events: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 100;
+  }
 }
