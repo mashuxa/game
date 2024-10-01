@@ -1,0 +1,23 @@
+@use '../../styles/common';
+
+app-component {
+  &::part(controller-selected-wrapper) {
+    box-sizing: content-box;
+    display: flex;
+    justify-content: center;
+    align-items: start;
+    column-gap: 3px;
+    padding: 1.357rem 0;
+    margin-bottom: 1.357rem;
+    min-height: 3rem;
+  }
+
+  &::part(controller-selected-letter) {
+    @extend .centred;
+
+    border-radius: 25%;
+    max-width: 42px;
+    color: #4D4D4D;
+    background-color: white;
+  }
+}

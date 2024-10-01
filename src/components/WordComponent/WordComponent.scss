@@ -1,0 +1,18 @@
+@use '../../styles/common';
+
+app-component {
+  &::part(word-cell-wrapper) {
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: center;
+    column-gap: 6px;
+    height: 100%;
+    font-size: inherit;
+  }
+
+  &::part(word-cell) {
+    @extend .centred;
+
+    border-radius: 25%;
+  }
+}

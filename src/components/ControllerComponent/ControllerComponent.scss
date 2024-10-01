@@ -1,0 +1,50 @@
+@use '../../styles/common';
+
+app-component {
+  --shadow-width-letter: min(0.78vw, 5px);
+  --shadow-width-round: min(1.875vw, 12px);
+
+  &::part(controller-wrapper) {
+    padding: min(7vw, 45px);
+    height: 45.86vh;
+   }
+
+  &::part(controller-letters) {
+    position: relative;
+    border-radius: 50%;
+    aspect-ratio: 1;
+    box-shadow: 0 0 0 var(--shadow-width-round) #3E4A68, inset 0 0 0 var(--shadow-width-round) #3E4A68;
+    width: min(42.18vw, 23.767vh);
+    max-width: 270px;
+    margin: 0 auto;
+  }
+
+  &::part(controller-letter) {
+    @extend .centred;
+
+    transition: left 0.3s ease-in-out, top 0.3s ease-in-out, background-color 0.1s, color 0.1s;
+    position: absolute;
+    cursor: pointer;
+    font-size: min(8.75vw, 56px);
+    width: min(14vw, 90px);
+    border-radius: 50%;
+    color: #4D4D4D;
+    background-color: #FFF;
+    box-shadow: 0 var(--shadow-width-letter) 0 0 #9FA1A5;
+    transform: translate(-50%, -50%);
+  }
+
+  &::part(controller-letter selected) {
+    color: #FFF;
+    background-color: #E870A5;
+    box-shadow: 0 var(--shadow-width-letter) 0 0 #B0638D;
+  }
+
+  &::part(controller-line) {
+    pointer-events: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 100;
+  }
+}
