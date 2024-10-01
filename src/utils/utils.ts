@@ -64,3 +64,36 @@ export const getCenterCoordinates = (node: HTMLElement): { x: number; y: number 
 
   return { x, y };
 };
+
+export const updatePathCoordinates = (
+  centerCoordinates: number[],
+  prevPath: number[][],
+  lastCoordinates: number[],
+): number[][] => {
+  if (!prevPath.length) return [...prevPath, lastCoordinates];
+
+  const [cx, cy] = centerCoordinates;
+  const [lastX, lastY] = lastCoordinates;
+  const prev = prevPath[prevPath.length - 1];
+  const [prevX, prevY] = prev.length === 4 ? [prev[2], prev[3]] : prev;
+
+  const midX = (prevX + lastX) / 2;
+  const midY = (prevY + lastY) / 2;
+
+  const toCenterX = cx - midX;
+  const toCenterY = cy - midY;
+
+  const lengthToCenter = Math.sqrt(toCenterX ** 2 + toCenterY ** 2);
+
+  const normToCenterX = lengthToCenter && toCenterX / lengthToCenter;
+  const normToCenterY = lengthToCenter && toCenterY / lengthToCenter;
+
+  const deltaX = lastX - prevX;
+  const deltaY = lastY - prevY;
+  const segmentLength = Math.sqrt(deltaX ** 2 + deltaY ** 2);
+  const controlDistance = segmentLength / 3;
+  const controlX = midX - normToCenterX * controlDistance;
+  const controlY = midY - normToCenterY * controlDistance;
+
+  return [...prevPath, [controlX, controlY, lastX, lastY]];
+};

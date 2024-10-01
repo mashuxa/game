@@ -1,6 +1,12 @@
+import { throttle } from "lodash";
 import { COLUMN_GAP } from "../../styles/theme";
 import { AppEvent } from "../../types/events";
-import { calculateCirclePercentCoordinates, getCenterCoordinates, shuffleArray } from "../../utils/utils";
+import {
+  calculateCirclePercentCoordinates,
+  getCenterCoordinates,
+  shuffleArray,
+  updatePathCoordinates,
+} from "../../utils/utils";
 import template from "./ControllerComponent.template";
 
 export class ControllerComponent extends HTMLElement {
@@ -8,12 +14,13 @@ export class ControllerComponent extends HTMLElement {
   private selected: HTMLElement[];
   private pointerdown: boolean;
   private linePath: number[][];
+  private controllerCenter: number[];
 
   private root: ShadowRoot;
   private controllerNode: Element | null;
   private selectedLetters: Element | null;
   private touchedLetter: Element | null;
-  private lineNode: Element | null;
+  private lineNode: SVGElement | null;
 
   constructor() {
     super();
@@ -21,6 +28,7 @@ export class ControllerComponent extends HTMLElement {
     this.selected = [];
     this.pointerdown = false;
     this.linePath = [];
+    this.controllerCenter = [];
 
     this.root = this.getRootNode() as ShadowRoot;
     this.controllerNode = null;
@@ -53,6 +61,7 @@ export class ControllerComponent extends HTMLElement {
     this.selected = [];
     this.selectedLetters?.setAttribute("letters", "");
     this.lineNode?.setAttribute("d", "");
+    this.linePath = [];
   };
   onPointerIn = ({ target }: PointerEvent): void => {
     const node = target as HTMLElement;
@@ -64,7 +73,7 @@ export class ControllerComponent extends HTMLElement {
       } else if (!this.selected.includes(node)) {
         const { x, y } = getCenterCoordinates(node);
 
-        this.linePath = [...this.linePath, [x, y]];
+        this.linePath = updatePathCoordinates(this.controllerCenter, this.linePath, [x, y]);
         this.selected.push(node);
         node.part.add("selected");
       }
@@ -91,22 +100,33 @@ export class ControllerComponent extends HTMLElement {
       this.onPointerIn({ target: element, clientX, clientY } as PointerEvent);
     }
   };
-  renderLine = ({ clientX, clientY }: PointerEvent) => {
+  renderLine = ({ clientX, clientY }: PointerEvent): void => {
     if (this.pointerdown) {
-      const pathData = [...this.linePath, [clientX, clientY]]
-        .map(([x, y], index) => `${index === 0 ? "M" : "L"} ${x} ${y}`)
+      const path = updatePathCoordinates(this.controllerCenter, this.linePath, [clientX, clientY]);
+
+      const pathData = path
+        .map(([x1, y1, x2, y2], index) => (index === 0 ? `M ${x1} ${y1}` : `Q ${x1} ${y1} ${x2} ${y2}`))
         .join(" ");
 
       this.lineNode?.setAttribute("d", pathData);
     }
   };
 
+  updateCenter(): void {
+    if (this.controllerNode) {
+      this.controllerCenter = Object.values(getCenterCoordinates(this.controllerNode as HTMLElement));
+    }
+  }
+
   connectedCallback(): void {
+    const throttledResize = throttle(() => this.updateCenter(), 300);
+
     this.innerHTML = template;
     this.controllerNode = this.querySelector(".controller-letters");
     this.selectedLetters = this.querySelector("selected-letters-component");
     this.lineNode = this.root.querySelector("#controller-dynamic-line");
 
+    window.addEventListener("resize", throttledResize);
     document.addEventListener("pointerdown", this.setPointerDown);
     document.addEventListener("mouseup", this.setPointerUp);
     document.addEventListener("touchend", this.setPointerUp);
@@ -119,6 +139,7 @@ export class ControllerComponent extends HTMLElement {
     }
 
     this.render();
+    this.updateCenter();
   }
 
   render(): void {

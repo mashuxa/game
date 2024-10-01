@@ -14,7 +14,7 @@ export default (level: number): string => {
         }    
     </style>
     <svg part="controller-line" width="100%" height="100%">
-        <path id="controller-dynamic-line" d="" stroke="#658dc4" stroke-width="20" fill="none"/>
+        <path id="controller-dynamic-line" d="" stroke-linecap="round" stroke-linejoin="round" stroke="#658dc4" stroke-width="20" fill="none"/>
     </svg>
     <main part="app-wrapper" style="max-width: ${MAX_APP_WIDTH}">
         <h1 part="main-title">Уровень ${level}</h1>
